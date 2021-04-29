@@ -1,5 +1,8 @@
 {
-  "image": "docker:20.10.6-git",
-  "runArgs": ["--init", "--privileged"],
-  "overrideCommand": false
+	"name": "Experiments",
+	"dockerFile": "Dockerfile",
+	"runArgs": ["--init"],
+	"mounts": [ "source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind" ],
+	"remoteUser": "vscode",
+	"overrideCommand": false
 }
