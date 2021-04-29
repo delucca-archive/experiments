@@ -1,27 +1,36 @@
-# Customizing your repository
+<p align="center">
+  <br>
+   <img src="https://media.giphy.com/media/LUP2aIHiivhcI/giphy.gif" alt="Professor Utonium sillouette creating the Powerpuff Girls" title="Experiments header's GIF" />
+  <br>
+</p>
+<p align="center">
+Multi-purpose reproducible experiments
+</p>
 
-After creating a new repository with this template, some files may require proper customization. To do so, please follow these steps:
+# Template Base
 
-## Prerequisites
+* [Why](#why)
+* [Quickstart](#quickstart)
+* [Usage](#usage)
+* [License](#license)
 
-* [gomplate][]
-* [tree][]
+## Why
 
-## Customization
+While researching, it is common to create and reproduce experiments. This repository aims to organize all my experiments in a single source. Each experiment here is independent and completely decoupled from others.
 
-### Step 1: Define your variables
+## Quickstart
 
-You can do so by replacing the values inside the `customize.json` file
+Most of my experiments are using [Docker](docker-website). You must install it in your workstation before reproducing ony of those. Alternatively, you can use [our devcontainer](devcontainer-folder).
 
-### Step 2: Run the customization binary
+## Usage
 
-```sh
-./customize
-```
+All my experiments are inside the [experiments folder](experiments-folder). There, you can navigate to the experiment you want to reproduce and read the `README.md` file of that experiment. That file will explain everything you need to know to reproduce that given experiment.
 
-### Step 3: Enjoy!
+## License
 
-Now, your repository is ready to go!
+This repository is distributed under the Apache 2.0 License. See [`LICENSE`][license] for more information.
 
-[gomplate]: https://docs.gomplate.ca/installing/
-[tree]: https://linux.die.net/man/1/tree
+[docker-website]: https://docker.com
+[devcontainer-folder]: ./devcontainer
+[experiments-folder]: ./experiments
+[license]: LICENSE
