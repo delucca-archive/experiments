@@ -1,3 +1,4 @@
 #!/bin/bash
 
-sudo apt-get install shellcheck
+sudo apt-get update -y
+sudo apt-get install -y shellcheck
