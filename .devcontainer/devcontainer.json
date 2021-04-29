@@ -1,7 +1,10 @@
 {
 	"name": "Experiments",
 	"dockerFile": "Dockerfile",
-	"runArgs": ["--init"],
-	"remoteUser": "codespaces",
-	"overrideCommand": false
+	"runArgs": ["--init", "--privileged"],
+	"overrideCommand": false,
+	"extensions": [
+		"ms-azuretools.vscode-docker"
+	],
+	"remoteUser": "codespaces"
 }
