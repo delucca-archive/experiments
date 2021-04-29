@@ -2,7 +2,6 @@
 	"name": "Experiments",
 	"dockerFile": "Dockerfile",
 	"runArgs": ["--init"],
-	"mounts": [ "source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind" ],
-	"remoteUser": "vscode",
+	"remoteUser": "codespaces",
 	"overrideCommand": false
 }
