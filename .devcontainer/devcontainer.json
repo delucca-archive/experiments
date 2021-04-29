@@ -4,7 +4,7 @@
 	"runArgs": ["--init", "--privileged"],
 	"overrideCommand": false,
 	"remoteUser": "vscode",
-	"postStartCommand": "./scripts/install-dev-dependencies.sh",
+	"postCreateCommand": "./scripts/install-dev-dependencies.sh",
 	"extensions": [
 		"ms-azuretools.vscode-docker"
 	]
