@@ -6,5 +6,5 @@
 	"extensions": [
 		"ms-azuretools.vscode-docker"
 	],
-	"remoteUser": "codespaces"
+	"remoteUser": "vscode"
 }
