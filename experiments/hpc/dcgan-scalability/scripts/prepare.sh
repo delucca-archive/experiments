@@ -7,6 +7,7 @@ source <(curl -s "https://raw.githubusercontent.com/delucca/shell-functions/1.0.
 
 SCRIPTS_DIR_PATH=$(cd -- "$(dirname "$0")" >/dev/null 2>&1 || throw_error "It was not possible to find scripts dir" ; pwd -P)
 EXPERIMENT_DIR_PATH=$(dirname "${SCRIPTS_DIR_PATH}")
+DCGAN_DIR_PATH="${EXPERIMENT_DIR_PATH}/dcgan"
 
 TEXT_BOLD=$(tput bold)
 TEXT_COLORIZED=$(tput setaf 5) # Magenta
@@ -46,11 +47,10 @@ function get_input_data {
 function get_source_code {
   log_in_category "Prepare" "Getting DCGAN source code"
 
-  src_dir_path="src"
-  if [ ! -d "${src_dir_path}"]; then
-    git clone git@github.com:otavioon/Distributed-DCGAN.git "${data_dir_path}" || throw_error "Cannot clone de DCGAN repository"
+  if [ ! -d "${DCGAN_DIR_PATH}" ]; then
+    git clone git@github.com:otavioon/Distributed-DCGAN.git "${DCGAN_DIR_PATH}" || throw_error "Cannot clone de DCGAN repository"
   else
-    pushd "${src_dir_path}"
+    pushd "${DCGAN_DIR_PATH}"
     git pull
     popd
   fi
@@ -58,6 +58,10 @@ function get_source_code {
 
 function refresh_docker_image {
   log_in_category "Prepare" "Refreshing experiment Docker image"
+
+  pushd "${DCGAN_DIR_PATH}"
+  docker build -t experiment:dcgan-scalability . || throw_error "Cannot build experiment Docker image"
+  popd
 }
 
 main "${@}"
