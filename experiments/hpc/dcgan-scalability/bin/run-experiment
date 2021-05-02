@@ -8,7 +8,7 @@ EXPERIMENT_DIR_PATH=$(dirname "${BIN_DIR_PATH}")
 ROOT_DIR_PATH=$(git rev-parse --show-toplevel)
 
 TEXT_BOLD=$(tput bold)
-TEXT_CYAN=$(tput setaf 6)
+TEXT_COLORIZED=$(tput setaf 6) # Cyan
 TEXT_RESET=$(tput sgr0)
 
 source <(curl -s "https://raw.githubusercontent.com/delucca/shell-functions/1.0.1/modules/feedback.sh")
@@ -24,8 +24,7 @@ function main {
 }
 
 function log_experiment_settings {
-  echo "$(highlight "Experiment settings:") Parsing experiment settings"
-
+  log_in_category "Experiment settings" "Parsing experiment settings"
   log_basic_settings
 }
 
@@ -35,10 +34,17 @@ function execute_script {
   bash "${EXPERIMENT_DIR_PATH}/scripts/${script_name}"
 }
 
+function log_in_category {
+  category=$1
+  text=$2
+
+  echo "$(highlight "${category}:") ${text}"
+}
+
 function highlight {
   text=$1
 
-  echo "${TEXT_BOLD}${TEXT_CYAN}${text}${TEXT_RESET}"
+  echo "${TEXT_BOLD}${TEXT_COLORIZED}${text}${TEXT_RESET}"
 }
 
 main "${@}"
