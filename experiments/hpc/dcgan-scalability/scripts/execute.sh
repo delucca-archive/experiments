@@ -126,7 +126,7 @@ EOF
         --dataset cifar10 \
         --dataroot ./data \
         --batch_size "${batch_size}" \
-	--num_epochs "${number_of_epochs}
+	--num_epochs "${number_of_epochs}"
 
   { time docker run \
     --env OMP_NUM_THREADS=1 \
