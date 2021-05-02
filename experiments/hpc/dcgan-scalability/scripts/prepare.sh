@@ -16,8 +16,8 @@ TEXT_RESET=$(tput sgr0)
 function main {
   log_in_category "Prepare" "Preparing experiment"
 
-  get_input_data
   get_source_code
+  get_input_data
   refresh_docker_image
 }
 
@@ -37,10 +37,10 @@ function highlight {
 function get_input_data {
   log_in_category "Prepare" "Getting input data"
 
-  data_dir_path="${EXPERIMENT_DIR_PATH}/data"
+  data_dir_path="${DCGAN_DIR_PATH}/data"
   rm -rf "${data_dir_path}" && mkdir -p "${data_dir_path}" || throw_error "Cannot create data dir"
   wget --no-check-certificate https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz -O - \
-    | tar -xvz -C "${EXPERIMENT_DIR_PATH}/data" --strip-components=1 \
+    | tar -xvz -C "${DCGAN_DIR_PATH}/data" --strip-components=1 \
     || throw_error "Cannot fetch CIFAR-10 dataset"
 }
 

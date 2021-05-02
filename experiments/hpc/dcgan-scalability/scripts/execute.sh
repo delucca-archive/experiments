@@ -5,6 +5,10 @@ set -o pipefail
 
 source <(curl -s "https://raw.githubusercontent.com/delucca/shell-functions/1.0.1/modules/feedback.sh")
 
+SCRIPTS_DIR_PATH=$(cd -- "$(dirname "$0")" >/dev/null 2>&1 || throw_error "It was not possible to find scripts dir" ; pwd -P)
+EXPERIMENT_DIR_PATH=$(dirname "${SCRIPTS_DIR_PATH}")
+IMAGE="${1:-experiment:dcgan-scalability}"
+
 TEXT_BOLD=$(tput bold)
 TEXT_COLORIZED=$(tput setaf 2) # Green
 TEXT_RESET=$(tput sgr0)
@@ -33,6 +37,11 @@ function highlight {
 
 function execute_trial_one {
   log_in_category "Trial 1" "Starting trial"
+
+  trial_number="1"
+  number_of_processes="1"
+
+  execute_trial "${trial_number}" "${number_of_processes}"
 }
 
 function execute_trial_two {
@@ -45,6 +54,51 @@ function execute_trial_three {
 
 function execute_trial_four {
   log_in_category "Trial 4" "Starting trial"
+}
+
+function execute_trial {
+  trial_number=$1
+  number_of_processes=$2
+  batch_size=${3:-32}
+
+  log_in_category "Trial ${trial_number}" "Executing trial with ${number_of_processes} processes and ${batch_size} samples"
+
+  pushd "${EXPERIMENT_DIR_PATH}/dcgan"
+
+  docker run \
+    -d \
+    --env OMP_NUM_THREADS=1 \
+    --rm --network=host \
+    -v=$(pwd):/root \
+    "${IMAGE}" \
+    python -m torch.distributed.launch \
+      --nproc_per_node="${number_of_processes}" \
+      --nnodes=2 \
+      --node_rank=0 \
+      --master_addr="172.17.0.1" \
+      --master_port=1234 \
+      dist_dcgan.py \
+        --batch_size="${batch_size}" \
+        --dataset cifar10 \
+        --dataroot ./data
+
+  time docker run \
+    --env OMP_NUM_THREADS=1 \
+    --rm --network=host \
+    -v=$(pwd):/root \
+    "${IMAGE}" \
+    python -m torch.distributed.launch \
+      --nproc_per_node="${number_of_processes}" \
+      --nnodes=2 \
+      --node_rank=1 \
+      --master_addr="172.17.0.1" \
+      --master_port=1234 \
+      dist_dcgan.py \
+        --batch_size="${batch_size}" \
+        --dataset cifar10 \
+        --dataroot ./data
+
+  popd
 }
 
 main "${@}"
