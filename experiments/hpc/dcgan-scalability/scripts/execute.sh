@@ -78,7 +78,7 @@ function execute_trial {
   number_of_processes=$2
   batch_size=${3:-32}
   number_of_samples=${4:-3}
-  number_of_epochs=${5:-1}
+  number_of_epochs=${5:-25}
 
   cat <<EOF >> $LOG_FILE_PATH
 TRIAL $trial_number
@@ -99,7 +99,7 @@ function execute_trial_sample {
   sample_number=$2
   number_of_processes=$3
   batch_size=${4:-32}
-  number_of_epochs=${5:1}
+  number_of_epochs=${5:-25}
 
   log_in_category "Trial ${trial_number}" "Executing sample ${sample_number} with ${number_of_processes} processes and batch size of ${batch_size}"
   cat <<EOF >> $LOG_FILE_PATH
