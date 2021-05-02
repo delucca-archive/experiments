@@ -2,9 +2,10 @@
 	"name": "Experiments",
 	"dockerFile": "Dockerfile",
 	"runArgs": ["--init", "--privileged"],
-	"overrideCommand": false,
-	"remoteUser": "vscode",
+	"mounts": ["source=dind-var-lib-docker,target=/var/lib/docker,type=volume"],
 	"postCreateCommand": "./bin/install-dev-dependencies",
+	"remoteUser": "vscode",
+	"overrideCommand": false,
 	"extensions": [
 		"ms-azuretools.vscode-docker"
 	]
