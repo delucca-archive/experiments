@@ -40,7 +40,7 @@ function get_input_data {
   data_dir_path="${DCGAN_DIR_PATH}/data"
   rm -rf "${data_dir_path}" && mkdir -p "${data_dir_path}" || throw_error "Cannot create data dir"
   wget --no-check-certificate https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz -O - \
-    | tar -xvz -C "${DCGAN_DIR_PATH}/data" --strip-components=1 \
+    | tar -xvz -C "${DCGAN_DIR_PATH}/data" \
     || throw_error "Cannot fetch CIFAR-10 dataset"
 }
 

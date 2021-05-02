@@ -63,13 +63,16 @@ function execute_trial {
 
   log_in_category "Trial ${trial_number}" "Executing trial with ${number_of_processes} processes and ${batch_size} samples"
 
-  pushd "${EXPERIMENT_DIR_PATH}/dcgan"
+  dcgan_dir_path="${EXPERIMENT_DIR_PATH}/dcgan"
+  pushd "${dcgan_dir_path}"
+
+  echo $dcgan_dir_path
 
   docker run \
     -d \
     --env OMP_NUM_THREADS=1 \
     --rm --network=host \
-    -v=$(pwd):/root \
+    -v="${dcgan_dir_path}":/root \
     "${IMAGE}" \
     python -m torch.distributed.launch \
       --nproc_per_node="${number_of_processes}" \
@@ -85,7 +88,7 @@ function execute_trial {
   time docker run \
     --env OMP_NUM_THREADS=1 \
     --rm --network=host \
-    -v=$(pwd):/root \
+    -v="${dcgan_dir_path}":/root \
     "${IMAGE}" \
     python -m torch.distributed.launch \
       --nproc_per_node="${number_of_processes}" \

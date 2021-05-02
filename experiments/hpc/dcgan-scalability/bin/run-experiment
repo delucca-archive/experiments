@@ -18,9 +18,9 @@ function main {
   log_title "DCGAN SCALABILITY EXPERIMENT"
   log_experiment_settings
 
-  execute_script "prepare.sh"
-  execute_script "execute.sh"
-  execute_script "cleanup.sh"
+  execute_script "prepare.sh" || throw_error "Cannot prepare experiment"
+  execute_script "execute.sh" || throw_error "Cannot run experiment"
+  #execute_script "cleanup.sh" || throw_error "Cannot cleanup experiment"
 }
 
 function log_experiment_settings {
