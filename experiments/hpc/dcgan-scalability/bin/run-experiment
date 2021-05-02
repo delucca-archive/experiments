@@ -20,7 +20,7 @@ function main {
 
   execute_script "prepare.sh" || throw_error "Cannot prepare experiment"
   execute_script "execute.sh" || throw_error "Cannot run experiment"
-  #execute_script "cleanup.sh" || throw_error "Cannot cleanup experiment"
+  execute_script "cleanup.sh" || throw_error "Cannot cleanup experiment"
 }
 
 function log_experiment_settings {

@@ -7,6 +7,8 @@ source <(curl -s "https://raw.githubusercontent.com/delucca/shell-functions/1.0.
 
 SCRIPTS_DIR_PATH=$(cd -- "$(dirname "$0")" >/dev/null 2>&1 || throw_error "It was not possible to find scripts dir" ; pwd -P)
 EXPERIMENT_DIR_PATH=$(dirname "${SCRIPTS_DIR_PATH}")
+DCGAN_DIR_PATH="${EXPERIMENT_DIR_PATH}/dcgan"
+LOG_FILE_PATH="${EXPERIMENT_DIR_PATH}/execution-time-report.log"
 IMAGE="${1:-experiment:dcgan-scalability}"
 
 TEXT_BOLD=$(tput bold)
@@ -46,33 +48,71 @@ function execute_trial_one {
 
 function execute_trial_two {
   log_in_category "Trial 2" "Starting trial"
+
+  trial_number="2"
+  number_of_processes="2"
+
+  execute_trial "${trial_number}" "${number_of_processes}"
 }
 
 function execute_trial_three {
   log_in_category "Trial 3" "Starting trial"
+
+  trial_number="3"
+  number_of_processes="4"
+
+  execute_trial "${trial_number}" "${number_of_processes}"
 }
 
 function execute_trial_four {
   log_in_category "Trial 4" "Starting trial"
+
+  trial_number="4"
+  number_of_processes="8"
+
+  execute_trial "${trial_number}" "${number_of_processes}"
 }
 
 function execute_trial {
   trial_number=$1
   number_of_processes=$2
   batch_size=${3:-32}
+  number_of_samples=${4:-3}
 
-  log_in_category "Trial ${trial_number}" "Executing trial with ${number_of_processes} processes and ${batch_size} samples"
+  cat <<EOF >> $LOG_FILE_PATH
+TRIAL $trial_number
+- Started at: $(date)
+- Number of processes: $number_of_processes
+- Batch size: $batch_size
+- Number of samples: $number_of_samples
+===================================================================================================
+EOF
 
-  dcgan_dir_path="${EXPERIMENT_DIR_PATH}/dcgan"
-  pushd "${dcgan_dir_path}"
+  for sample_number in $(seq 1 "${number_of_samples}"); do
+    execute_trial_sample $trial_number $sample_number $number_of_processes
+  done
+}
 
-  echo $dcgan_dir_path
+function execute_trial_sample {
+  trial_number=$1
+  sample_number=$2
+  number_of_processes=$3
+  batch_size=${4:-32}
+
+  log_in_category "Trial ${trial_number}" "Executing sample ${sample_number} with ${number_of_processes} processes and batch size of ${batch_size}"
+  cat <<EOF >> $LOG_FILE_PATH
+SAMPLE $sample_number
+- Started at: $(date)
+---------------------------------------------------------------------------------------------------
+EOF
+
+  pushd "${DCGAN_DIR_PATH}"
 
   docker run \
     -d \
     --env OMP_NUM_THREADS=1 \
     --rm --network=host \
-    -v="${dcgan_dir_path}":/root \
+    -v="${DCGAN_DIR_PATH}":/root \
     "${IMAGE}" \
     python -m torch.distributed.launch \
       --nproc_per_node="${number_of_processes}" \
@@ -85,10 +125,10 @@ function execute_trial {
         --dataset cifar10 \
         --dataroot ./data
 
-  time docker run \
+  { time docker run \
     --env OMP_NUM_THREADS=1 \
     --rm --network=host \
-    -v="${dcgan_dir_path}":/root \
+    -v="${DCGAN_DIR_PATH}":/root \
     "${IMAGE}" \
     python -m torch.distributed.launch \
       --nproc_per_node="${number_of_processes}" \
@@ -99,9 +139,22 @@ function execute_trial {
       dist_dcgan.py \
         --batch_size="${batch_size}" \
         --dataset cifar10 \
-        --dataroot ./data
+        --dataroot ./data ; } 2>> $LOG_FILE_PATH
 
   popd
+
+  cat <<EOF >> $LOG_FILE_PATH
+
+---------------------------------------------------------------------------------------------------
+EOF
+
+  stop_running_containers
+}
+
+function stop_running_containers {
+  log_in_category "Execute" "Stopping running containers"
+
+  docker kill $(docker ps -q)
 }
 
 main "${@}"

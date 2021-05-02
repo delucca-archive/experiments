@@ -8,6 +8,7 @@ source <(curl -s "https://raw.githubusercontent.com/delucca/shell-functions/1.0.
 SCRIPTS_DIR_PATH=$(cd -- "$(dirname "$0")" >/dev/null 2>&1 || throw_error "It was not possible to find scripts dir" ; pwd -P)
 EXPERIMENT_DIR_PATH=$(dirname "${SCRIPTS_DIR_PATH}")
 DCGAN_DIR_PATH="${EXPERIMENT_DIR_PATH}/dcgan"
+LOG_FILE_PATH="${EXPERIMENT_DIR_PATH}/execution-time-report.log"
 
 TEXT_BOLD=$(tput bold)
 TEXT_COLORIZED=$(tput setaf 5) # Magenta
@@ -19,6 +20,7 @@ function main {
   get_source_code
   get_input_data
   refresh_docker_image
+  create_report_log
 }
 
 function log_in_category {
@@ -61,6 +63,15 @@ function refresh_docker_image {
 
   pushd "${DCGAN_DIR_PATH}"
   docker build -t experiment:dcgan-scalability . || throw_error "Cannot build experiment Docker image"
+  popd
+}
+
+function create_report_log {
+  pushd "${DCGAN_DIR_PATH}"
+
+  rm -rf "${LOG_FILE_PATH}"
+  touch "${LOG_FILE_PATH}"
+
   popd
 }
 
