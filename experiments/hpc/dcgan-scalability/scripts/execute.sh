@@ -78,7 +78,7 @@ function execute_trial {
   number_of_processes=$2
   batch_size=${3:-32}
   number_of_samples=${4:-3}
-  number_of_epochs=${5:-25}
+  number_of_epochs=${5:-1}
 
   cat <<EOF >> $LOG_FILE_PATH
 TRIAL $trial_number
@@ -99,7 +99,7 @@ function execute_trial_sample {
   sample_number=$2
   number_of_processes=$3
   batch_size=${4:-32}
-  number_of_epochs=${5:-25}
+  number_of_epochs=${5:-1}
 
   log_in_category "Trial ${trial_number}" "Executing sample ${sample_number} with ${number_of_processes} processes and batch size of ${batch_size}"
   cat <<EOF >> $LOG_FILE_PATH
@@ -110,24 +110,6 @@ EOF
 
   pushd "${DCGAN_DIR_PATH}"
 
-  docker run \
-    -d \
-    --env OMP_NUM_THREADS=1 \
-    --rm --network=host \
-    -v="${DCGAN_DIR_PATH}":/root \
-    "${IMAGE}" \
-    python -m torch.distributed.launch \
-      --nproc_per_node="${number_of_processes}" \
-      --nnodes=2 \
-      --node_rank=0 \
-      --master_addr="172.17.0.1" \
-      --master_port=1234 \
-      dist_dcgan.py \
-        --dataset cifar10 \
-        --dataroot ./data \
-        --batch_size "${batch_size}" \
-	--num_epochs "${number_of_epochs}"
-
   { time docker run \
     --env OMP_NUM_THREADS=1 \
     --rm --network=host \
@@ -135,15 +117,15 @@ EOF
     "${IMAGE}" \
     python -m torch.distributed.launch \
       --nproc_per_node="${number_of_processes}" \
-      --nnodes=2 \
-      --node_rank=1 \
+      --nnodes=1 \
+      --node_rank=0 \
       --master_addr="172.17.0.1" \
       --master_port=1234 \
       dist_dcgan.py \
         --dataset cifar10 \
         --dataroot ./data \
         --batch_size "${batch_size}" \
-	--num_epochs "${number_of_epochs}" ; } 2>> $LOG_FILE_PATH
+        --num_epochs "${number_of_epochs}" ; } 2>> $LOG_FILE_PATH
 
   popd
 
